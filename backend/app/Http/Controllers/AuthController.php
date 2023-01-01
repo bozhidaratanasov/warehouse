@@ -14,8 +14,8 @@ class AuthController extends Controller
 
     use HttpResponses;
 
-    public function register(RegisterUserRequest $request) {
-        
+    public function register(RegisterUserRequest $request) 
+    {    
         $request->validated($request->only(['username', 'email', 'password']));
 
         $user = User::create([
@@ -32,8 +32,8 @@ class AuthController extends Controller
         ], 'Registration is sucessful.', 201);
     }
 
-    public function login(LoginUserRequest $request) {
-
+    public function login(LoginUserRequest $request) 
+    {
         $request->validated($request->only(['email', 'password']));
 
         if(!Auth::attempt($request->only('email', 'password'))) {
@@ -47,11 +47,11 @@ class AuthController extends Controller
         return $this->success([
             'user' => $user,
             'token' => $token
-        ]);
+        ], 'Login is successful.');
     }
 
-    public function logout() {
-
+    public function logout() 
+    {
         Auth::user()->currentAccessToken()->delete();
 
         return $this->success('', 'You have succesfully been logged out and your token has been removed.');
