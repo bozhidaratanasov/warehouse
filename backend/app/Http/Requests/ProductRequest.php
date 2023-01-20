@@ -29,7 +29,7 @@ class ProductRequest extends FormRequest
             'image' => ['mimes:jpeg, jpg, png'],
             'buying_price' => ['required'],
             'selling_price' => ['required'],
-            'count' => ['required'],
+            'quantity' => ['required'],
             'category' => ['required'],
             'code' => ['required', 'unique:products']
         ];

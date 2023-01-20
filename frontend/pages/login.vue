@@ -35,12 +35,18 @@
 </template>
 
 <script setup>
+useHead({
+  title: 'Login'
+})
 
 const email = ref(null);
 const password = ref(null);
 
 const cookieToken = useCookie('token');
 const token = useState('token');
+
+if (token.value)
+  navigateTo('/products');
 
 const login = async () => {
   await $fetch('http://localhost:8000/api/login', {

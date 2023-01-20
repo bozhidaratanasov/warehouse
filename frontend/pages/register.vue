@@ -63,6 +63,9 @@
 </template>
 
 <script setup>
+useHead({
+  title: 'Register'
+})
 
 const username = ref(null);
 const email = ref(null);
@@ -71,6 +74,9 @@ const password = ref(null);
 const confirmPassword = ref(null);
 
 const token = useCookie('token');
+
+if (token.value)
+  navigateTo('/products');
 
 const register = async () => {
   await $fetch('http://localhost:8000/api/register', {

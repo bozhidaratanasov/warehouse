@@ -15,7 +15,7 @@ class Product extends Model
         'image', 
         'buying_price', 
         'selling_price',
-        'count',
+        'quantity',
         'category',
         'code'
     ];

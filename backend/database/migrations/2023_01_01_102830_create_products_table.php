@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->decimal('buying_price');
             $table->decimal('selling_price');
-            $table->unsignedInteger('count');
+            $table->unsignedInteger('quantity');
             $table->enum('category', ['Хранителни стоки', 'Канцеларски материали', 'Строителни материали']);
             $table->string('code')->unique();
             $table->timestamps();
