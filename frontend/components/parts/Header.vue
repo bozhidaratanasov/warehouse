@@ -38,6 +38,10 @@ const logout = async () => {
   }).then(() => {
     cookieToken.value = null;
     token.value = null;
+    useNuxtApp().$toast.success('Successfully logged out!', {
+      transition: useNuxtApp().$toast.TRANSITIONS.SLIDE,
+      autoClose: 4000
+    });
     navigateTo('/login');
   });
 }

@@ -93,6 +93,10 @@ const deleteProduct = async (productId) => {
         }
       }).then(async () => {
         await filterProducts();
+        useNuxtApp().$toast.success('Product successfully deleted!', {
+          transition: useNuxtApp().$toast.TRANSITIONS.SLIDE,
+          autoClose: 4000
+        });
       });
     }
   })
