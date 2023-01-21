@@ -2,13 +2,15 @@
   <div>
     <Header />
     <slot />
+    <Footer/>
   </div>
 </template>
 
 <script>
 import Header from "../components/parts/Header";
+import Footer from "../components/parts/Footer";
 export default {
   name: "default",
-  components: {Header}
+  components: {Footer, Header}
 }
 </script>

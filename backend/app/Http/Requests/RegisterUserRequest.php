@@ -25,9 +25,10 @@ class RegisterUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'username' => ['required', 'string', 'min:5', 'max:15', 'unique:users'],
+            'username' => ['required', 'string', 'min:5', 'max:15', 'unique:users', 'regex:^[A-Za-z-]+$^'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', 'min:6', 'max:20', Rules\Password::defaults()]
+            'phone' => ['nullable', 'regex:^[0-9\s-]+$^'],
+            'password' => ['required', 'confirmed', 'min:6', 'max:20', 'regex:^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$^']
 
         ];
     }

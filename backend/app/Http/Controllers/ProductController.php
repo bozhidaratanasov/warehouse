@@ -33,7 +33,13 @@ class ProductController extends Controller
     {
         $request->validated();
 
-        $product = Product::create($request->all());
+        $requestData = $request->all();
+
+        if ($request->hasFile('image')) {
+            $requestData['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        $product = Product::create($requestData);
 
         return $this->success(new ProductResource($product), 'Product was successfully created', 201);
     }
@@ -58,7 +64,13 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {   
-        $product->update($request->all());
+        $requestData = $request->all();
+
+        if ($request->hasFile('image')) {
+            $requestData['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        $product->update($requestData);
 
         return new ProductResource($product);
     }

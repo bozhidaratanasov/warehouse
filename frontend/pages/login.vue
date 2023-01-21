@@ -9,17 +9,20 @@
                  name="email"
                  id="email"
                  placeholder="Your email"
+                 required
                  class="bg-gray-100 border-2 w-full p-4 rounded-lg">
         </div>
 
-        <div>
+        <div class="text-center">
           <label for="password" class="sr-only">Password</label>
           <input v-model="password"
                  type="password"
                  name="password"
                  id="name"
                  placeholder="Password"
-                 class="bg-gray-100 border-2 w-full p-4 rounded-lg">
+                 required
+                 class="bg-gray-100 border-2 w-full p-4 rounded-lg mb-2">
+          <nuxt-link to="/register" class="text-blue-400">Don't have an account? Register now.</nuxt-link>
         </div>
 
         <div>
@@ -58,7 +61,16 @@ const login = async () => {
   }).then(res => {
     cookieToken.value = res.data.token;
     token.value = res.data.token;
+    useNuxtApp().$toast.success('Successfully logged in!', {
+      transition: useNuxtApp().$toast.TRANSITIONS.SLIDE,
+      autoClose: 4000
+    });
     navigateTo('/products');
+  }).catch(() => {
+    useNuxtApp().$toast.error('Wrong username or password!', {
+      transition: useNuxtApp().$toast.TRANSITIONS.SLIDE,
+      autoClose: 4000
+    });
   })
 }
 </script>

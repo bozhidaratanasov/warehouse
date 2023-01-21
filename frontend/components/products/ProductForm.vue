@@ -1,8 +1,11 @@
 <template>
   <div class="flex justify-center">
     <div class="w-4/12 bg-white p-6 rounded-lg">
-      <h1 class="text-center text-3xl text-blue-500 mb-4">{{ productId ? 'Edit Product' : 'Create Product'}}</h1>
+      <h1 class="text-center text-4xl text-blue-500 mb-4">{{ productId ? 'Edit Product' : 'Create Product' }}</h1>
       <form @submit.prevent="submit" class="space-y-6">
+        <div class="text-center" v-if="errors">
+          <p v-for="error in errors" :key="error" class="text-red-500">{{ error[0] }}</p>
+        </div>
         <div>
           <label for="title" class="sr-only">Title</label>
           <input v-model="title"
@@ -10,6 +13,7 @@
                  name="title"
                  id="title"
                  placeholder="Title"
+                 required
                  class="bg-gray-100 border-2 w-full p-4 rounded-lg">
         </div>
 
@@ -30,6 +34,7 @@
                  name="code"
                  id="code"
                  placeholder="Code"
+                 required
                  class="bg-gray-100 border-2 w-full p-4 rounded-lg">
         </div>
 
@@ -49,6 +54,8 @@
                  name="buyingPrice"
                  id="buyingPrice"
                  placeholder="Buying price"
+                 step=".01"
+                 required
                  class="bg-gray-100 border-2 w-full p-4 rounded-lg">
         </div>
 
@@ -59,6 +66,8 @@
                  name="selling-price"
                  id="selling-price"
                  placeholder="Selling Price"
+                 step=".01"
+                 required
                  class="bg-gray-100 border-2 w-full p-4 rounded-lg">
         </div>
 
@@ -69,6 +78,7 @@
                  name="quantity"
                  id="quantity"
                  placeholder="Quantity"
+                 required
                  class="bg-gray-100 border-2 w-full p-4 rounded-lg">
         </div>
 
@@ -78,9 +88,16 @@
                  name="image"
                  id="image"
                  placeholder="Image"
-                 class="bg-gray-100 border-2 w-full p-4 rounded-lg">
+                 accept=".jpeg,.jpg,.png"
+                 class="bg-gray-100 border-2 w-full p-4 rounded-lg"
+                 @change="setFile">
         </div>
-        <div>
+        <div class="flex justify-between space-x-12">
+          <button type="button"
+                  class="bg-red-500 hover:bg-red-400 text-white px-4 py-3 rounded font-medium w-full"
+                  @click="navigateTo('/products')">
+            Cancel
+          </button>
           <button type="submit"
                   class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-3 rounded font-medium w-full">
             {{ productId ? 'Edit' : 'Create' }}
@@ -93,18 +110,21 @@
 </template>
 
 <script setup>
+import axios from 'axios';
+
 const token = useState('token');
 const route = useRoute();
 const productId = route.params.id;
 
-const title = ref(null);
-const description = ref(null);
-const code = ref(null);
+const title = ref('');
+const description = ref('');
+const code = ref('');
 const category = ref('Хранителни стоки');
-const buyingPrice = ref(null);
-const sellingPrice = ref(null);
-const quantity = ref(null);
+const buyingPrice = ref('');
+const sellingPrice = ref('');
+const quantity = ref('');
 const image = ref(null);
+const errors = ref(null);
 
 if (productId) {
   await $fetch(`http://localhost:8000/api/products/${productId}`, {
@@ -121,8 +141,12 @@ if (productId) {
     buyingPrice.value = data.buying_price;
     sellingPrice.value = data.selling_price;
     quantity.value = data.quantity;
-  })
+  });
 }
+
+const setFile = (event) => {
+  image.value = event.target.files[0];
+};
 
 const submit = async () => {
   if (productId)
@@ -130,45 +154,64 @@ const submit = async () => {
 
   else
     await createProduct();
-}
+};
 
 const createProduct = async () => {
-  await $fetch('http://localhost:8000/api/products', {
-    method: 'POST',
-    body: {
-      title: title.value,
-      description: description.value,
-      code: code.value,
-      category: category.value,
-      buying_price: buyingPrice.value,
-      selling_price: sellingPrice.value,
-      quantity: quantity.value
-    },
+  const formData = new FormData();
+  formData.append('title', title.value);
+  formData.append('description', description.value);
+  formData.append('code', code.value);
+  formData.append('category', category.value);
+  formData.append('buying_price', buyingPrice.value);
+  formData.append('selling_price', sellingPrice.value);
+  formData.append('quantity', quantity.value);
+
+  if (image.value)
+    formData.append('image', image.value);
+
+  await axios.post('http://localhost:8000/api/products', formData, {
     headers: {
       'Authorization': 'Bearer ' + token.value
     }
   }).then(() => {
+    useNuxtApp().$toast.success('Product successfully created!', {
+      transition: useNuxtApp().$toast.TRANSITIONS.SLIDE,
+      autoClose: 4000
+    });
     navigateTo('/products');
+  }).catch(err => {
+    errors.value = err.response.data.errors;
+    console.log(errors.value)
   })
-}
+};
 
 const editProduct = async () => {
-  await $fetch(`http://localhost:8000/api/products/${productId}`, {
-    method: 'PUT',
-    body: {
-      title: title.value,
-      description: description.value,
-      code: code.value,
-      category: category.value,
-      buying_price: buyingPrice.value,
-      selling_price: sellingPrice.value,
-      quantity: quantity.value
-    },
+  const formData = new FormData();
+  formData.append('title', title.value);
+  formData.append('description', description.value);
+  formData.append('code', code.value);
+  formData.append('category', category.value);
+  formData.append('buying_price', buyingPrice.value);
+  formData.append('selling_price', sellingPrice.value);
+  formData.append('quantity', quantity.value);
+  formData.append('_method', 'PUT')
+
+  if (image.value)
+    formData.append('image', image.value);
+
+  await axios.post(`http://localhost:8000/api/products/${productId}`, formData, {
     headers: {
       'Authorization': 'Bearer ' + token.value
     }
   }).then(() => {
+    useNuxtApp().$toast.success('Product successfully edited!', {
+      transition: useNuxtApp().$toast.TRANSITIONS.SLIDE,
+      autoClose: 4000
+    });
     navigateTo('/products');
+  }).catch(err => {
+    errors.value = err.response.data.errors;
+    console.log(errors.value)
   })
-}
+};
 </script>
